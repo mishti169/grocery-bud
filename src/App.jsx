@@ -2,36 +2,57 @@ import React, { Component } from "react";
 import Input from "./components/Input/Input";
 import List from "./components/List/List";
 
-class App extends Component {
-  state = {
-    data: [
-      { name: "mishti", id: 123 },
-      { name: "mayur", id: 456 },
-    ],
-    editName: "",
-  };
+export const TimePassContext = React.createContext(null);
 
-  onAddItem = (value, id) => {
+const initialState = {
+  data: [],
+  editName: "",
+  editId: null,
+  isEdit: false,
+};
+
+class App extends Component {
+  state = initialState;
+
+  addNewItem = (value) => {
     const val = value.trim();
 
     if (!val) {
       return;
     }
-
-    // if ID exists then this items needs to be edited
-    // if (id) {
-    // return after doing the edit operation;
-    //   return;
-    // }
-    console.log("value", val);
-    id = parseInt(Math.random() * 1000);
+    const id = parseInt(Math.random() * 1000);
     this.setState({
       data: [{ name: val, id: id }, ...this.state.data],
     });
   };
 
+  updateEditedItem = (value) => {
+    const newArr = [...this.state.data];
+    // done
+    const temp = { name: value, id: this.state.editId };
+    const index = newArr.findIndex((currentItem) => {
+      if (currentItem.id === this.state.editId) {
+        return true;
+      }
+      return false;
+    });
+    newArr[index] = temp;
+    this.setState({ data: newArr });
+  };
+
+  onAddItem = (value) => {
+    if (this.state.isEdit) {
+      // written in input box is a an Edit Item
+      this.updateEditedItem(value);
+      this.setState({ isEdit: false });
+    } else {
+      // user is adding a new item
+      this.addNewItem(value);
+    }
+  };
+
   onClear = () => {
-    this.setState({ data: [] });
+    this.setState({ ...initialState });
   };
 
   onDelete = (id) => {
@@ -43,21 +64,22 @@ class App extends Component {
     });
     this.setState({ data: x });
   };
-  onEdit = (name) => {
-    this.setState({ editName: name });
+
+  onEdit = (name, id) => {
+    this.setState({ editName: name, editId: id, isEdit: true });
   };
+
   render() {
     return (
-      <div>
-        <h2>Grocery Bud</h2>
-        <Input onAdd={this.onAddItem} value={this.state.editName} />
-        <List
-          items={this.state.data}
-          onClear={this.onClear}
-          onDelete={this.onDelete}
-          onEdit={this.onEdit}
-        />
-      </div>
+      <TimePassContext.Provider
+        value={{ onEdit: this.onEdit, onDelete: this.onDelete }}
+      >
+        <div>
+          <h2>Grocery Bud</h2>
+          <Input onAdd={this.onAddItem} value={this.state.editName} />
+          <List items={this.state.data} onClear={this.onClear} />
+        </div>
+      </TimePassContext.Provider>
     );
   }
 }

@@ -13,11 +13,13 @@ class Input extends Component {
   onChange = (e) => {
     this.setState({ value: e.target.value });
   };
+
   componentDidUpdate(prevProp) {
     if (prevProp.value !== this.props.value) {
       this.setState({ value: this.props.value });
     }
   }
+
   render() {
     return (
       <div>

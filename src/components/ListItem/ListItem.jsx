@@ -1,17 +1,22 @@
 import React from "react";
+import { TimePassContext } from "../../App";
 
 const ListItem = (props) => {
-  const handleClick = () => {
-    props.onDelete(props.id);
-  };
   return (
-    <div>
-      <div>
-        <span>{props.name}</span>
-        <button onClick={() => props.onEdit(props.name)}>Edit</button>
-        <button onClick={handleClick}>Delete</button>
-      </div>
-    </div>
+    <TimePassContext.Consumer>
+      {(obj) => {
+        const { onEdit, onDelete } = obj;
+        return (
+          <div>
+            <div>
+              <span>{props.name}</span>
+              <button onClick={() => onEdit(props.name, props.id)}>Edit</button>
+              <button onClick={() => onDelete(props.id)}>Delete</button>
+            </div>
+          </div>
+        );
+      }}
+    </TimePassContext.Consumer>
   );
 };
 
